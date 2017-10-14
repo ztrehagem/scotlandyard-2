@@ -35,6 +35,10 @@ module.exports = class Receiver extends EventEmitter {
     }
   }
 
+  onMessage(message) {
+
+  }
+
   onEnd() {
     this.emit('end');
   }

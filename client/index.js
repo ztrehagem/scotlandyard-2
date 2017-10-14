@@ -2,6 +2,7 @@ const net = require('net');
 const sender = require('../common/sender');
 const Receiver = require('../common/receiver');
 const commands = require('../common/commands');
+const Messenger = require('../common/messenger');
 
 module.exports = class Client {
   constructor() {
@@ -24,7 +25,9 @@ module.exports = class Client {
   }
 
   onMessage(message) {
+    const [cmd, cmdName, body] = Messenger.parse(message);
 
+    console.log('message', cmdName, body.toString());
   }
 
   onEnd() {

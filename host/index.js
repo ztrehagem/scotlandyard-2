@@ -3,6 +3,7 @@ const Server = require('./server');
 const Game = require('./game');
 const sender = require('../common/sender');
 const commands = require('../common/commands');
+const Messenger = require('../common/messenger');
 
 const State = {
   STANDBY: 'standby',
@@ -26,9 +27,7 @@ module.exports = class Host {
   }
 
   onClientMessage(client, message) {
-    const cmd = message.readUInt8();
-    const body = message.slice(1);
-    const cmdName = commands[cmd];
+    const [cmd, cmdName, body] = Messenger.parse(message);
 
     console.log('message', cmdName, body.toString());
   }
