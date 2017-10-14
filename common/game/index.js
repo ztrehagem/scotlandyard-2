@@ -16,6 +16,16 @@ module.exports = class Game extends EventEmitter {
     this.activePoliceId = 0;
   }
 
+  serialize() {
+    return {
+      thief: this.thief,
+      polices: this.polices,
+      turn: this.turn,
+      player: this.player,
+      activePoliceId: this.activePoliceId,
+    };
+  }
+
   actThief(movement, movement2) {
     if (this.player != PlayerType.THIEF) {
       throw new Error('Game#actThief : not thief turn');

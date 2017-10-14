@@ -1,6 +1,6 @@
 const uuid = require('uuid/v4');
 const Server = require('./server');
-const Game = require('./game');
+const Game = require('../common/game');
 const sender = require('../common/sender');
 const commands = require('../common/commands');
 const Messenger = require('../common/messenger');
@@ -29,7 +29,46 @@ module.exports = class Host {
   onClientMessage(client, message) {
     const [cmd, cmdName, body] = Messenger.parse(message);
 
-    console.log('message', cmdName, body.toString());
+    switch (cmd) {
+      case commands.SET_NAME:
+        client.name = body.toString();
+        console.log('setname', client.hostname, client.name);
+        break;
+      case commands.FETCH:
+        console.log('fetch', client.hostname);
+        this.notify(client);
+        break;
+      case commands.ACT_POLICE:
+        if (client.thief) return;
+        console.log('act_police', client.hostname);
+        this.actPolice(JSON.parse(body.toString()));
+        break;
+      case commands.ACT_THIEF:
+        if (!client.thief) return;
+        console.log('act_thief', client.hostname);
+        this.actThief(JSON.parse(body.toString()));
+        break;
+      default:
+        console.log('unknown command', cmd);
+    }
+  }
+
+  actPolice({id, movement}) {
+    try {
+      this.game.actPolice(id, movement);
+      this.notifyAll();
+    } catch (e) {
+      console.log('error on actPolice', e);
+    }
+  }
+
+  actThief({movement, movement2}) {
+    try {
+      this.game.actThief(movement, movement2);
+      this.notifyAll();
+    } catch (e) {
+      console.log('error on actThief', e);
+    }
   }
 
   start() {
@@ -47,9 +86,26 @@ module.exports = class Host {
 
     const client = this.server.clients.find(client => client.id == thiefPlayerId);
     client.thief = true;
-
-    // TODO: broadcast
     this.state = State.GAME;
+    return this.notifyAll();
+  }
+
+  makeInfo() {
+    return {
+      game: this.game.serialize(),
+      clients: this.server.clients_s,
+      time: Date.now(),
+    };
+  }
+
+  notify(client) {
+    const body = JSON.stringify(this.makeInfo());
+    return sender.send(client.socket, commands.GAME, Buffer.from(body));
+  }
+
+  notifyAll() {
+    const body = JSON.stringify(this.makeInfo());
+    return sender.sendAll(this.server.sockets, commands.GAME, Buffer.from(body));
   }
 
   loadGame(filename) {
@@ -59,9 +115,5 @@ module.exports = class Host {
 
   saveGame() {
     // TODO: implement
-  }
-
-  get clients() {
-    return this.server.clients.map(client => client.serialize());
   }
 }

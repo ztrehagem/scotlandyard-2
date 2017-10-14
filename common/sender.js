@@ -1,6 +1,6 @@
 const commands = require('./commands');
 
-const makeData = (cmd, bodyBuf) => {
+const makeData = (cmd, bodyBuf = new Buffer([])) => {
   const contentsBuf = Buffer.concat([Buffer.from([cmd]), bodyBuf]);
   const lenBuf = new Buffer(4);
   lenBuf.writeInt32BE(contentsBuf.length);

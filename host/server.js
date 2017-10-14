@@ -2,6 +2,7 @@ const net = require('net');
 const EventEmitter = require('events');
 const Client = require('./client');
 const commands = require('../common/commands');
+const Sender = require('../common/sender');
 
 module.exports = class Server extends EventEmitter {
   constructor() {
@@ -30,5 +31,13 @@ module.exports = class Server extends EventEmitter {
       this.emit('client:disconnected', client.hostname)
     });
     this.emit('client:connected', client.hostname);
+  }
+
+  get clients_s() {
+    return this.clients.map(client => client.serialize());
+  }
+
+  get sockets() {
+    return this.clients.map(client => client.socket);
   }
 }
