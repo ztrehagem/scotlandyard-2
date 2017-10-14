@@ -2,6 +2,7 @@ const uuid = require('uuid/v4');
 const Server = require('./server');
 const Game = require('./game');
 const sender = require('../common/sender');
+const commands = require('../common/commands');
 
 const State = {
   STANDBY: 'standby',
@@ -11,41 +12,32 @@ const State = {
 
 const game = new Game();
 const server = new Server();
-const clients = [];
-const getClientSockets = () => clients.map(client => client.getSocket());
 
 let state = State.STANDBY;
 
-server.on('client:connected', (client) => {
-  client.id = uuid();
-  clients.push(client);
-  console.log('connected', client);
+server.on('client:connected', (clientHostname) => {
+  console.log('connected', clientHostname);
 });
 
-server.on('client:disconnected', (client) => {
-  clients.splice(clients.indexOf(client), 1);
-  console.log('disconnected', client);
+server.on('client:disconnected', (clientHostname) => {
+  console.log('disconnected', clientHostname);
 });
 
-server.on('client:message:set_name', ([client, body]) => {
-  const name = body.toString();
-  client.name = name;
-  console.log('set_name', client);
+server.on('client:message', ([client, message]) => {
+  const cmd = message.readUInt8();
+  const body = message.slice(1);
+  const cmdName = commands[cmd];
+
+  console.log('message', cmdName, body.toString());
 });
 
-exports.getClients = () => {
-  return clients.map(client => {
-    const filtered = Object.assign({}, client);
-    delete filtered.getSocket;
-    return filtered;
-  });
-};
+exports.getClients = () => server.clients.map(client => client.serialize());
 
 exports.startGame = (thiefPlayerId) => {
-  const client = clients.find(client => client.id = thiefPlayerId);
-  client.thief = true;
+  const thiefClient = server.clients.find(client => client.id == thiefPlayerId);
+  thiefClient.thief = true;
 
-  sender.startGame(getClientSockets(), game);
+  // broadcast 
 };
 
 exports.loadGame = (filename) => {
