@@ -10,42 +10,59 @@ const State = {
   FINISHED: 'finished',
 };
 
-const game = new Game();
-const server = new Server();
+module.exports = class Host {
+  constructor() {
+    this.game = null;
+    this.server = null;
+    this.state = null;
+  }
 
-let state = State.STANDBY;
+  onClientConnected(hname) {
+    console.log('connected', hname);
+  }
 
-server.on('client:connected', (clientHostname) => {
-  console.log('connected', clientHostname);
-});
+  onClientDisconnected(hname) {
+    console.log('disconnected', hname);
+  }
 
-server.on('client:disconnected', (clientHostname) => {
-  console.log('disconnected', clientHostname);
-});
+  onClientMessage(client, message) {
+    const cmd = message.readUInt8();
+    const body = message.slice(1);
+    const cmdName = commands[cmd];
 
-server.on('client:message', ([client, message]) => {
-  const cmd = message.readUInt8();
-  const body = message.slice(1);
-  const cmdName = commands[cmd];
+    console.log('message', cmdName, body.toString());
+  }
 
-  console.log('message', cmdName, body.toString());
-});
+  start() {
+    this.game = new Game();
+    this.server = new Server();
+    this.server.on('client:connected', hname => this.onClientConnected(hname));
+    this.server.on('client:disconnected', hname => this.onClientDisconnected(hname));
+    this.server.on('client:message', ([client, message]) => this.onClientMessage(client, message));
+    this.state = State.STANDBY;
+    return new Promise(res => this.server.listen(res));
+  }
 
-exports.getClients = () => server.clients.map(client => client.serialize());
+  startGame(thiefPlayerId) {
+    if (this.state != State.STANDBY) return;
 
-exports.startGame = (thiefPlayerId) => {
-  const thiefClient = server.clients.find(client => client.id == thiefPlayerId);
-  thiefClient.thief = true;
+    const client = this.server.clients.find(client => client.id == thiefPlayerId);
+    client.thief = true;
 
-  // broadcast 
-};
+    // TODO: broadcast
+    this.state = State.GAME;
+  }
 
-exports.loadGame = (filename) => {
-  // TODO: implement
-};
+  loadGame(filename) {
+    if (this.state != State.STANDBY) return;
+    // TODO: implement
+  }
 
-exports.saveGame = () => {
-  // TODO: implement
-};
+  saveGame() {
+    // TODO: implement
+  }
 
-server.listen();
+  get clients() {
+    return this.server.clients.map(client => client.serialize());
+  }
+}
