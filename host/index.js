@@ -20,10 +20,12 @@ module.exports = class Host {
 
   onClientConnected(hname) {
     console.log('connected', hname);
+    this.notifyAll();
   }
 
   onClientDisconnected(hname) {
     console.log('disconnected', hname);
+    this.notifyAll();
   }
 
   onClientMessage(client, message) {
@@ -33,6 +35,7 @@ module.exports = class Host {
       case commands.SET_NAME:
         client.name = body.toString();
         console.log('setname', client.hostname, client.name);
+        this.notifyAll();
         break;
       case commands.FETCH:
         console.log('fetch', client.hostname);

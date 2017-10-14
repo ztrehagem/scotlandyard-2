@@ -54,13 +54,11 @@ module.exports = class Game extends EventEmitter {
   switchTurnToPolice() {
     this.player = PlayerType.POLICE;
     this.activePoliceId = 0;
-    this.emit('switch-turn:police');
   }
 
   switchTurnToThief() {
     this.player = PlayerType.THIEF;
     ++this.turn;
-    this.emit('switch-turn:thief');
   }
 
   get thiefMovements() {

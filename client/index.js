@@ -34,6 +34,7 @@ module.exports = class Client {
     switch (cmd) {
       case commands.GAME:
         const {game, time, clients} = JSON.parse(body.toString());
+        if (this.time > time) break;
         this.game = game;
         this.time = time;
         this.clients = clients;
