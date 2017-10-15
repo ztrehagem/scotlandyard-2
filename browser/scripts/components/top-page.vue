@@ -32,6 +32,8 @@ div
 </template>
 
 <script>
+import inner from '../modules/inner';
+
 export default {
   data: () => ({
     joinInfo: {
@@ -46,11 +48,14 @@ export default {
   }),
   methods: {
     join({address, port, playerName}) {
-      console.log('join', arguments);
+      console.log('join', arguments[0]);
     },
     host({port, playerName}) {
-      console.log('host', arguments);
+      console.log('host', arguments[0]);
     },
+  },
+  mounted() {
+    console.log(inner.test());
   },
 };
 </script>
