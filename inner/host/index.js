@@ -26,7 +26,7 @@ module.exports = class Host {
 
   onClientConnected(hname) {
     console.log('connected', hname);
-    this.notifyAll();
+    // this.notifyAll();
   }
 
   onClientDisconnected(hname) {
@@ -81,7 +81,6 @@ module.exports = class Host {
   }
 
   start(port) {
-    this.game = new Game();
     this.server = new Server();
     this.server.on('client:connected', hname => this.onClientConnected(hname));
     this.server.on('client:disconnected', hname => this.onClientDisconnected(hname));
@@ -90,18 +89,22 @@ module.exports = class Host {
     return this.server.listen(port);
   }
 
-  startGame(thiefPlayerId) {
+  startGame() {
     if (this.state != State.STANDBY) return;
-
-    const client = this.server.clients.find(client => client.id == thiefPlayerId);
-    client.thief = true;
+    if (this.server.clients.every(client => !client.thief)) return;
     this.state = State.GAME;
+    this.game = this.game || new Game();
+    return this.notifyAll();
+  }
+
+  setThiefPlayer(thiefPlayerId) {
+    this.server.clients.forEach((client) => client.thief = client.id == thiefPlayerId);
     return this.notifyAll();
   }
 
   makeInfo() {
     return {
-      game: this.game.serialize(),
+      game: this.game && this.game.serialize(),
       clients: this.server.clients_s,
       time: Date.now(),
     };

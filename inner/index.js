@@ -1,34 +1,72 @@
+const EventEmitter = require('events');
 const Host = require('./host');
 const Client = require('./client');
 
-let host = null;
-let client = null;
-
-const clean = async () => {
-  if (client) {
-    await client.disconnect();
-    client = null;
+module.exports = new (class Inner extends EventEmitter {
+  constructor() {
+    super();
+    this.host = null;
+    this.client = null;
   }
-  if (host) {
-    await host.close();
-    host = null;
+
+  async clean() {
+    if (this.client) {
+      await this.client.disconnect();
+      this.client = null;
+    }
+    if (this.host) {
+      await this.host.close();
+      this.host = null;
+    }
   }
-};
 
-exports.startHost = async (port, name, cb) => {
-  clean();
-  host = new Host();
-  await host.start(parseInt(port) || undefined);
-  client = new Client();
-  await client.connect(parseInt(port) || undefined);
-  await client.setName(name);
-  cb();
-};
+  // host
+  async startHost(port, name) {
+    this.clean();
+    this.host = new Host();
+    await this.host.start(parseInt(port) || undefined);
+    await this._initClient(name, port);
+  }
 
-exports.startClient = async (address, port, name, cb) => {
-  clean();
-  client = new Client();
-  await client.connect(parseInt(port) || undefined, address);
-  await client.setName(name);
-  cb();
-};
+  setThiefPlayer(thiefPlayerId) {
+    return this.host.setThiefPlayer(thiefPlayerId);
+  }
+
+  startGame() {
+    return this.host.startGame();
+  }
+
+  // client
+  async startClient(address, port, name) {
+    this.clean();
+    await this._initClient(name, port, address);
+  }
+
+  fetch() {
+    return this.client.fetch();
+  }
+
+  getGame() {
+    return this.client.game;
+  }
+
+  getClients() {
+    return this.client.clients;
+  }
+
+  actPolice(id, movement) {
+    return this.client.actPolice(id, movement);
+  }
+
+  actThief(movement, movement2) {
+    return this.client.actThief(movement, movement2);
+  }
+
+  // private
+  async _initClient(name, port, address) {
+    this.client = new Client();
+    this.client.on('update', () => this.emit('update'));
+    await this.client.connect(parseInt(port) || undefined, address);
+    await this.client.setName(name);
+  }
+});

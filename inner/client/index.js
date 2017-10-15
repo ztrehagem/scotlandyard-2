@@ -1,12 +1,14 @@
 const net = require('net');
+const EventEmitter = require('events');
 const Game = require('../common/game');
 const sender = require('../common/sender');
 const Receiver = require('../common/receiver');
 const commands = require('../common/commands');
 const Messenger = require('../common/messenger');
 
-module.exports = class Client {
+module.exports = class Client extends EventEmitter {
   constructor() {
+    super();
     this.socket = null;
     this.receiver = null;
     this.buf = new Buffer([]);
@@ -38,9 +40,8 @@ module.exports = class Client {
         this.game = game;
         this.time = time;
         this.clients = clients;
-        console.log(time);
-        console.log(clients);
-        console.log(game);
+        this.emit('update', this);
+        console.log('updated game', time);
         break;
       default:
         console.log('unknown command', cmd);

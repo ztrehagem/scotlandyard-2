@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-  h2 menu
+  h1 menu
   table
     thead: tr
       th join game
@@ -47,15 +47,13 @@ export default {
     },
   }),
   methods: {
-    join({address, port, playerName}) {
-      inner.startClient(address, port, playerName, () => {
-        console.log('ok client');
-      });
+    async join({address, port, playerName}) {
+      await inner.startClient(address, port, playerName);
+      this.$router.push({name: 'game'});
     },
-    host({port, playerName}) {
-      inner.startHost(port, playerName, () => {
-        console.log('ok host');
-      });
+    async host({port, playerName}) {
+      await inner.startHost(port, playerName);
+      this.$router.push({name: 'game', params: {host: true}});
     },
   },
 };
