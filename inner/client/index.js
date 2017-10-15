@@ -17,8 +17,8 @@ module.exports = class Client {
     this.clients = [];
   }
 
-  async connect() {
-    await new Promise(res => this.socket = net.createConnection(23456, '127.0.0.1', res));
+  async connect(port = 23456, address = '127.0.0.1') {
+    await new Promise(res => this.socket = net.createConnection(port, address, res));
     this.receiver = new Receiver(this.socket);
     this.receiver.on('message', message => this.onServerMessage(message));
     this.receiver.on('end', () => this.onEnd());

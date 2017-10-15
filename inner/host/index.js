@@ -18,6 +18,12 @@ module.exports = class Host {
     this.state = null;
   }
 
+  close() {
+    this.game = null;
+    this.state = null;
+    return this.server.close();
+  }
+
   onClientConnected(hname) {
     console.log('connected', hname);
     this.notifyAll();
@@ -74,14 +80,14 @@ module.exports = class Host {
     }
   }
 
-  start() {
+  start(port) {
     this.game = new Game();
     this.server = new Server();
     this.server.on('client:connected', hname => this.onClientConnected(hname));
     this.server.on('client:disconnected', hname => this.onClientDisconnected(hname));
     this.server.on('client:message', ([client, message]) => this.onClientMessage(client, message));
     this.state = State.STANDBY;
-    return new Promise(res => this.server.listen(res));
+    return this.server.listen(port);
   }
 
   startGame(thiefPlayerId) {

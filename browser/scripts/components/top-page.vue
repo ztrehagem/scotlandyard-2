@@ -10,13 +10,13 @@ div
         form(@submit.prevent="join(joinInfo)")
           div: label
             span server ip address
-            input(type="text" placeholder="127.0.0.1" v-model.trim="joinInfo.address")
+            input(type="text" required placeholder="127.0.0.1" v-model.trim="joinInfo.address")
           div: label
             span server port number
             input(type="number" placeholder="default 23456" v-model.number="joinInfo.port")
           div: label
             span your name
-            input(type="text" v-model.trim="joinInfo.playerName")
+            input(type="text" required v-model.trim="joinInfo.playerName")
           div
             button(type="submit") join
       td
@@ -26,7 +26,7 @@ div
             input(type="text" placeholder="default 23456" v-model.number="hostInfo.port")
           div: label
             span your name
-            input(type="text" v-model.trim="hostInfo.playerName")
+            input(type="text" required v-model.trim="hostInfo.playerName")
           div
             button(type="submit") start
 </template>
@@ -48,14 +48,15 @@ export default {
   }),
   methods: {
     join({address, port, playerName}) {
-      console.log('join', arguments[0]);
+      inner.startClient(address, port, playerName, () => {
+        console.log('ok client');
+      });
     },
     host({port, playerName}) {
-      console.log('host', arguments[0]);
+      inner.startHost(port, playerName, () => {
+        console.log('ok host');
+      });
     },
-  },
-  mounted() {
-    console.log(inner.test());
   },
 };
 </script>

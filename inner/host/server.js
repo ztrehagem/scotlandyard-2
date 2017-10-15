@@ -14,11 +14,15 @@ module.exports = class Server extends EventEmitter {
     this.server = net.createServer();
     this.server.on('connection', socket => this.onConnected(socket));
     this.server.on('error', () => console.log('server error'));
-    this.server.on('listening', () => console.log('listening...'));
+    // this.server.on('listening', () => console.log('listening...'));
   }
 
-  listen() {
-    this.server.listen(23456);
+  listen(port = 23456) {
+    return new Promise(res => this.server.listen(port, res));
+  }
+
+  close() {
+    return new Promise(res => this.server.close(res));
   }
 
   onConnected(socket) {
