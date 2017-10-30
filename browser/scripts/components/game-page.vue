@@ -7,6 +7,7 @@ div
     .game-box-header
       .turn TURN {{game.turn}}
       .player {{player}}
+    map-box
     hr
     .debug-box
       form(@submit.prement="debugThief")
@@ -50,13 +51,14 @@ div
 <script>
 import inner from '../modules/inner';
 import ClientList from './client-list.vue';
+import MapBox from './map-box.vue';
 
 export default {
   components: {
     ClientList,
+    MapBox,
   },
   data: () => ({
-    isHost: false,
     clients: [],
     game: null,
     test: {
@@ -71,6 +73,9 @@ export default {
     },
   }),
   computed: {
+    isHost() {
+      return inner.hasHost();
+    },
     player() {
       switch (this.game.player) {
         case 'thief': return '怪盗';
@@ -115,7 +120,6 @@ export default {
     },
   },
   created() {
-    this.isHost = !!this.$route.params.host;
     inner.on('update', () => this.onUpdate());
     this.onUpdate();
   },

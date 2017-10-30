@@ -1,6 +1,7 @@
 const net = require('net');
 const EventEmitter = require('events');
 const Game = require('../common/game');
+const generateMap = require('../common/game/maps/proto');
 const sender = require('../common/sender');
 const Receiver = require('../common/receiver');
 const commands = require('../common/commands');
@@ -14,6 +15,8 @@ module.exports = class Client extends EventEmitter {
     this.buf = new Buffer([]);
     this.len = -1;
     this.thief = false;
+    this.map = generateMap();
+    console.log(this.map);
     this.game = null;
     this.time = null;
     this.clients = [];

@@ -21,8 +21,12 @@ module.exports = new (class Inner extends EventEmitter {
   }
 
   // host
+  hasHost() {
+    return !!this.host;
+  }
+
   async startHost(port, name) {
-    this.clean();
+    await this.clean();
     this.host = new Host();
     await this.host.start(parseInt(port) || undefined);
     await this._initClient(name, port);
@@ -52,6 +56,10 @@ module.exports = new (class Inner extends EventEmitter {
 
   getClients() {
     return this.client.clients;
+  }
+
+  getMapJSON() {
+    return JSON.stringify(this.client.map);
   }
 
   actPolice(id, movement) {
