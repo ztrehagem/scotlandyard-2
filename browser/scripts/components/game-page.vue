@@ -7,7 +7,7 @@ div
     .game-box-header
       .turn TURN {{game.turn}}
       .player {{player}}
-    map-box
+    map-canvas
     hr
     .debug-box
       form(@submit.prement="debugThief")
@@ -51,12 +51,12 @@ div
 <script>
 import inner from '../modules/inner';
 import ClientList from './client-list.vue';
-import MapBox from './map-box.vue';
+import MapCanvas from './map-canvas.vue';
 
 export default {
   components: {
     ClientList,
-    MapBox,
+    MapCanvas,
   },
   data: () => ({
     clients: [],

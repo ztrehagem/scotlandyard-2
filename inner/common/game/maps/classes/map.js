@@ -1,48 +1,25 @@
 const { TicketType: { TAXI, BUS, TUBE, BLACK } } = require('../../constants');
 
-module.exports = class Map {
-  constructor(slug, points, dummyies, lines) {
+// const pointsToHash = points => points.reduce((converted, point) => Object.assign(converted, {[point.id]: point}), {});
+
+exports.point = (id, x, y, taxi, bus, tube, black) => ({
+  id,
+  x,
+  y,
+  [TAXI]: taxi || [],
+  [BUS]: bus || [],
+  [TUBE]: tube || [],
+  [BLACK]: black || [],
+});
+exports.dummy = (id, x, y) => ({id, x, y});
+exports.line = (type, a, b) => ({type, a, b});
+
+
+exports.Map = class {
+  constructor(slug, {points, dummyies, lines}) {
     this.slug = slug;
-    this.logicalMap = {};
-    this.visualMap = {
-      points: {},
-      lines: [],
-    };
-    initLogicalMap(this.logicalMap, points);
-    initVisualMap(this.visualMap, points, dummyies, lines);
+    this.points = points;
+    this.dummyies = dummyies;
+    this.lines = lines;
   }
-}
-
-function initLogicalMap(map, points) {
-  points.forEach((point) => {
-    map[point.id] = {
-      id: point.id,
-      [TAXI]: point[TAXI],
-      [BUS]: point[BUS],
-      [TUBE]: point[TUBE],
-      [BLACK]: point[BLACK],
-    };
-  });
-}
-
-function initVisualMap({points: mapPoints, lines: mapLines}, points, dummyies, lines) {
-  points.forEach((point) => {
-    mapPoints[point.id] = {
-      id: point.id,
-      x: point.x,
-      y: point.y,
-      [TAXI]: point[TAXI] && !!point[TAXI].length,
-      [BUS]: point[BUS] && !!point[BUS].length,
-      [TUBE]: point[TUBE] && !!point[TUBE].length,
-    };
-  });
-  dummyies.forEach((point) => {
-    mapPoints[point.id] = {
-      dummy: true,
-      id: point.id,
-      x: point.x,
-      y: point.y,
-    };
-  });
-  mapLines.push(...lines);
-}
+};

@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 const Host = require('./host');
 const Client = require('./client');
+const { TicketType } = require('./common/game/constants');
 
 module.exports = new (class Inner extends EventEmitter {
   constructor() {
@@ -68,6 +69,10 @@ module.exports = new (class Inner extends EventEmitter {
 
   actThief(movement, movement2) {
     return this.client.actThief(movement, movement2);
+  }
+
+  get ticketTypes() {
+    return TicketType;
   }
 
   // private
