@@ -35,19 +35,19 @@ class Point {
     }
     if (this[BUS].length) {
       ctx.fillStyle = COLORS[BUS];
-      ctx.fillRect(this.x * ratio, this.y * ratio + boxWidth * 3 / 4 + 1, boxWidth, boxWidth / 4);
+      ctx.fillRect(this.x * ratio, this.y * ratio, boxWidth, boxWidth / 4 + 1);
     }
     if (this[TUBE].length) {
       ctx.fillStyle = COLORS[TUBE];
       ctx.fillRect(this.x * ratio, this.y * ratio + boxWidth / 4, boxWidth, boxWidth / 2);
     }
     ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.strokeRect(this.x * ratio, this.y * ratio, boxWidth, boxWidth);
     ctx.textAlign = 'center';
-    ctx.font = "15px sans-serif";
+    ctx.font = "10px sans-serif";
     ctx.fillStyle = '#000';
-    ctx.fillText(this.id, this.x * ratio + boxWidth / 2, this.y * ratio + boxWidth / 2 + 6);
+    ctx.fillText(this.id, this.x * ratio + boxWidth / 2, this.y * ratio + boxWidth / 2 + 4);
   }
 }
 
